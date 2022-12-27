@@ -1,0 +1,61 @@
+﻿@page "/display"
+@inject HttpClient Http
+
+<PageTitle>Display</PageTitle>
+
+<h3>Display</h3>
+
+<ul>
+    @foreach (var show in shows)
+    {
+
+
+        <li>
+            @show.name
+
+            <p>isCollapsed: @show.isCollapsed</p>
+
+            <ul>
+                @foreach (var episode in show.episodes)
+                {
+                    <li>
+                        @episode
+                    </li>
+                }
+            </ul>
+
+        </li>
+
+    }
+</ul>
+
+
+
+
+
+
+
+@code {
+    List<Show> shows = new List<Show> { new Show("Seinfeld", false, new string[] { "episode1" }) };
+
+
+
+    public class Show
+    {
+        public string name { get; set; }
+
+        public Boolean isCollapsed { get; set; }
+
+        public string[] episodes { get; set; }
+
+        public Show(string name, Boolean isCollapsed, string[] episodes)
+        {
+            this.name = name;
+            this.isCollapsed = isCollapsed;
+            this.episodes = episodes;
+        }
+
+    }
+
+
+}
