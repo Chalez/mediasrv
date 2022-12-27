@@ -5,57 +5,153 @@
 
 <h3>Display</h3>
 
-<ul>
-    @foreach (var show in shows)
-    {
+<style>
 
-
-        <li>
-            @show.name
-
-            <p>isCollapsed: @show.isCollapsed</p>
-
-            <ul>
-                @foreach (var episode in show.episodes)
-                {
-                    <li>
-                        @episode
-                    </li>
-                }
-            </ul>
-
-        </li>
-
+    .rowSelected{
+        background-color: #FFF;
     }
-</ul>
 
+    .rowDeselected{
+        background-color: #CCC;
+    }
 
+    .rowShown {
+        visibility: visible;
+    }
+
+    .rowHidden {
+        visibility: collapse;
+    }
+
+    .arrowIcon{
+        vertical-align: bottom; 
+        width: 20px;
+    }
+
+</style>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Rating</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var show in shows){
+            <tr class=@(show.selected? "rowSelected" : "rowDeselected") @onclick="@(() => show.selected = !show.selected)">
+                <td>
+                    <img class="arrowIcon" src=@(show.hidden? "icons/fast-arrow-right.svg" : "icons/fast-arrow-down.svg")
+                        @onclick="@(() => show.hidden = !show.hidden)" 
+                    />@string.Format("\t{0}\t", show.title)
+                </td>
+                <td>@show.rating</td>
+                <td>@show.summary</td>
+            </tr>
+            @foreach(var episode in show.episodes)
+            {
+
+                <tr 
+                    class=@string.Format(
+                        "{0} {1}", 
+                        episode.selected? "rowSelected" : "rowDeselected", 
+                        show.hidden? "rowHidden" : "rowShown")
+                        @onclick="@(() => episode.selected = !episode.selected)"
+                >
+                    <td style="white-space:pre;">@string.Format("\t{0}\t", episode.title)</td>
+                    <td>@episode.rating</td>
+                    <td>@episode.summary</td>
+                </tr>
+            }
+        }
+    </tbody>
+
+</table>
 
 
 
 
 
 @code {
-    List<Show> shows = new List<Show> { new Show("Seinfeld", false, new string[] { "episode1" }) };
+    List<Show> shows = new List<Show> {
+        new Show(
+            "Seinfeld", 
+            4.71,
+            "Seinfeld lives in an apartment",
+            new Episode[] { 
+                new Episode("The Robbery", 4.32, "Someone gets robbed", 1),
+                new Episode("The Architect", 5.0, "Something happens to Art Vandalay", 2),
+            }
+        ),
+        new Show(
+            "Breaking Bad",
+            4.71,
+            "Disgraced Chemistry Teacher gets a new job",
+            new Episode[] {
+                new Episode("The Van", 4.32, "Crystal Math", 1),
+                new Episode("More Crystal Math", 5.0, "The Sauce gets Cooked", 2),
+            }
+        )
+    };
 
 
-
-    public class Show
+    public class MediaElement
     {
-        public string name { get; set; }
+        public string title { get; set; }
+        public double rating { get; set; }
+        public string summary { get; set; }
 
-        public Boolean isCollapsed { get; set; }
+        public bool selected { get; set; }
+        public bool hidden { get; set; }
 
-        public string[] episodes { get; set; }
-
-        public Show(string name, Boolean isCollapsed, string[] episodes)
+        public MediaElement(string title, double rating, string summary)
         {
-            this.name = name;
-            this.isCollapsed = isCollapsed;
+            this.title = title;
+            this.rating = rating;
+            this.summary = summary;
+
+            this.selected = false;
+
+        }
+
+    }
+
+
+    public class Show : MediaElement
+    {
+
+        public Episode[] episodes { get; set; }
+        public bool isCollapsed { get; set; }
+
+        public Show(string title, double rating, string summary, Episode[] episodes) : base(title, rating, summary)
+        {
+
+            this.isCollapsed = true;
             this.episodes = episodes;
         }
 
     }
+
+
+    public class Episode : MediaElement
+    {
+        public int season{ get; set; }
+
+        public Episode(string title, double rating, string summary, int season) : base(title, rating, summary)
+        {
+            this.season = season;
+
+        }
+
+    }
+
+
+
+
+
+
 
 
 }
